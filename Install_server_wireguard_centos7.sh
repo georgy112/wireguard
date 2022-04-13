@@ -3,8 +3,8 @@
 yum update -y
 
 # Отключаем firewalld
-systenctl stop firewalld
-systenctl disable firewalld
+systemctl stop firewalld
+systemctl disable firewalld
 
 # Ставим репо
 curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
