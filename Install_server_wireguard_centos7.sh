@@ -34,7 +34,7 @@ wg genkey | tee client2-private.key | wg pubkey > client-public.key
 
 # Назначаем переменные, чтобы ключи сами добавились в конфиг
 SERVER_PRIVATE_KEY="$(cat /etc/wireguard/server-private.key)"
-CLIENT_PUBLIC_KEY=="$(cat /etc/wireguard/client-public.key)"
+CLIENT_PUBLIC_KEY="$(cat /etc/wireguard/client-public.key)"
 # Вывел отдельно, для проверки в конце на предмет правильного старта Wireguard
 PORT=36666
 
