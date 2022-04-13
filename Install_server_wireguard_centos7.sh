@@ -18,7 +18,12 @@ modprobe wireguard && lsmod | grep wireguard
 # Включите форвардинг пакетов между интерфейсами
 cat > /etc/sysctl.conf <<EOF
 net.ipv4.ip_forward = 1
+net.ipv4.conf.all.forwarding=1
+net.ipv6.conf.all.forwarding=1
 EOF
+
+# Проверяем вывод
+sysctl -p
 
 # Создаем директории Wireguard
 mkdir -p /etc/wireguard && cd /etc/wireguard
@@ -72,3 +77,6 @@ systemctl enable wg-quick@wg0-server
 
 # Проверяем стартанул ли наш vpn-интерфейс
 ip a show wg0-server
+
+# Проверяем туннель
+wg show
