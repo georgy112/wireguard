@@ -10,7 +10,7 @@ systemctl disable firewalld
 curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
 
 # Ставим ПО
-yum install epel-release -y && yum install wireguard-tools wireguard-dkms qrencode resolveconf -y
+yum install epel-release -y && yum install wireguard-tools wireguard-dkms qrencode -y
 
 # Проверям утсновку модуля ядра
 modprobe wireguard && lsmod | grep wireguard
