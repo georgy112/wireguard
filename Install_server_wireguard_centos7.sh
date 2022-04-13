@@ -21,7 +21,7 @@ net.ipv4.ip_forward = 1
 EOF
 
 # Создаем директории Wireguard
-mkdir /etc/wireguard && cd /etc/wireguard
+mkdir -p /etc/wireguard && cd /etc/wireguard
 
 # Генерим ключи сервера
 wg genkey | tee server-private.key | wg pubkey > server-public.key
