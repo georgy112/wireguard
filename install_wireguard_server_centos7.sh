@@ -19,11 +19,19 @@ net.ipv4.conf.all.forwarding=1
 net.ipv6.conf.all.forwarding=1
 EOF
 
+# VAR
+# Определяем живой интерфейс
+LAN="$(ip -o -4 route show to default | awk '{print $5}')"
+# Определяем свой IP
+IP="$(hostname -I | awk '{print $1}')"
+# Порт можно любой сделать
+PORT=36666
+
 # FIREWALLD
-# Останавливаем файрвол, также ниже будет еще iptables в конфиге.
+# Настраиваем файрвол, также ниже будет еще iptables в конфиге.
 systemctl enable firewalld
 systemctl start firewalld
-firewall-cmd --permanent --zone=public --add-port=36666/udp
+firewall-cmd --permanent --zone=public --add-port=$PORT/udp
 firewall-cmd --permanent --zone=public --add-masquerade
 firewall-cmd --reload
 
@@ -43,25 +51,21 @@ wg genkey | tee client2-private.key | wg pubkey > client2-public.key
 # Генерим ключи 3ого клиента
 wg genkey | tee client3-private.key | wg pubkey > client3-public.key
 
+# Пример генерации других ключей wg genkey | tee client-private-iphone8.key | wg pubkey > client-public-iphone8.key
+
 # Назначаем переменные, чтобы ключи сами добавились в конфиг
 SERVER_PRIVATE_KEY="$(cat /etc/wireguard/server-private.key)"
+SERVER_PUBLIC_KEY="$(cat /etc/wireguard/server-public.key)"
+CLIENT_PRIVATE_KEY="$(cat /etc/wireguard/client-private.key)"
 CLIENT_PUBLIC_KEY="$(cat /etc/wireguard/client-public.key)"
 CLIENT_PUBLIC_KEY1="$(cat /etc/wireguard/client2-public.key)"
 CLIENT_PUBLIC_KEY2="$(cat /etc/wireguard/client3-public.key)"
-CLIENT_PRIVATE_KEY="$(cat /etc/wireguard/client-private.key)"
-SERVER_PUBLIC_KEY="$(cat /etc/wireguard/server-public.key)"
-# Вывел отдельно, для проверки в конце на предмет правильного старта Wireguard
-PORT=36666
 
 # Выставляем правильные права на файлы
 chmod 600 ./*-private.key
 
 # Создаем конфиг сервера
 touch /etc/wireguard/wg0-server.conf
-
-# Назначаем переменную рабочего интерфейса сетевухи в которой есть инет, чтобы вставить в конфиг
-LAN="$(ip -br link show | grep -v lo | grep -v wg | grep -v tunsnx | grep -v wl | grep -v flannel | grep -v cni0 | grep -v veth | awk '{print $1}')"
-IP="$(hostname -I | awk '{print $1}')"
 
 # Проверяем что интерфейсов сетевухи должен быть один
 echo $LAN
@@ -84,7 +88,7 @@ PublicKey = $CLIENT_PUBLIC_KEY2
 AllowedIPs = 10.0.0.4/32
 EOF
 
-# Запускаем wireguard, где wg0-server - этот интефейс создается согласно наименованию конфига здесь /etc/wireguard/wg0-server.conf
+# Запускаем wireguard, где wg0-server. Этот интефейс создается согласно наименованию конфига здесь /etc/wireguard/wg0-server.conf
 systemctl enable wg-quick@wg0-server && systemctl start wg-quick@wg0-server
 
 # Проверяем запуск интерфейса
